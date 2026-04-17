@@ -1,14 +1,20 @@
 import { ErrorMessage, Field, Form, Formik } from "formik";
 import { Link } from "react-router";
+import { signin } from "../../services/auth";
+import { useContext } from "react";
+import { AuthContext } from "../../context";
 
 export default function Login() {
+  const authContext = useContext(AuthContext)
+  console.log(authContext)
+  
   return (
     <div className="min-h-screen w-full bg-alternative flex flex-col lg:grid lg:grid-cols-12 overflow-x-hidden">
-      
+
       {/* LEFT COLUMN: FORM */}
       <main className="lg:col-span-7 xl:col-span-8 flex flex-col items-center justify-center px-6 py-12 bg-studio border-r border-default shadow-2xl z-10">
         <div className="w-full max-w-100 flex flex-col">
-          
+
           {/* Header */}
           <header className="mb-10 text-left">
             <h1 className="text-3xl font-bold tracking-tight text-foreground">Welcome back</h1>
@@ -19,26 +25,39 @@ export default function Login() {
 
           {/* Formik Integration */}
           <Formik
-            initialValues={{ email: '', password: '' }}
+            initialValues={{ email: '', password: '' , username: '' }}
             validate={values => {
               const errors = {};
               if (!values.email) errors.email = 'Email is Required';
-              else if (!/^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i.test(values.email)) {
-                errors.email = 'Invalid email address';
-              }
+
               if (!values.password) errors.password = 'Password is Required';
               return errors;
             }}
             onSubmit={(values, { setSubmitting }) => {
-              setTimeout(() => {
-                console.log(values);
-                setSubmitting(false);
-              }, 1000);
+              
+             const response =  signin(values.username, values.password)
             }}
           >
             {({ isSubmitting, errors, touched }) => (
               <Form className="flex flex-col gap-y-6 text-start">
-                
+
+
+                <div className="flex flex-col gap-2">
+                  <label htmlFor="username" className="text-sm font-medium text-foreground">
+                    Username
+                  </label>
+                  <Field
+                    type="text"
+                    id="username"
+                    name="username"
+                    placeholder="arham"
+                    className={`flex w-full rounded-md border bg-foreground/[.02] px-3 py-2 text-sm ring-offset-background transition-all
+                      ${errors.username && touched.username ? 'border-destructive focus:ring-destructive' : 'border-control focus:ring-brand'}
+                      focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 h-10`}
+                  />
+                  <ErrorMessage name="username" component="span" className="text-xs text-destructive mt-1" />
+                </div>
+
                 {/* Email Field */}
                 <div className="flex flex-col gap-2">
                   <label htmlFor="email" className="text-sm font-medium text-foreground">
@@ -62,8 +81,8 @@ export default function Login() {
                     <label htmlFor="password" className="text-sm font-medium text-foreground">
                       Password
                     </label>
-                    <Link 
-                      to="/forgot-password" 
+                    <Link
+                      to="/forgot-password"
                       className="text-xs text-foreground-lighter hover:text-brand transition-colors"
                     >
                       Forgot password?
@@ -83,7 +102,7 @@ export default function Login() {
                       type="button"
                       className="absolute right-2 top-1/2 -translate-y-1/2 p-1 text-foreground-lighter hover:text-foreground"
                     >
-                      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg>
+                      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z" /><circle cx="12" cy="12" r="3" /></svg>
                     </button>
                   </div>
                   <ErrorMessage name="password" component="span" className="text-xs text-destructive mt-1" />
@@ -125,12 +144,12 @@ export default function Login() {
         <span className="absolute -top-10 -left-5 text-[200px] font-serif text-foreground-muted/10 pointer-events-none select-none">
           “
         </span>
-        
+
         <div className="relative z-10 space-y-8">
           <blockquote className="text-2xl xl:text-3xl font-medium text-foreground leading-snug italic">
             "Supabase is the best product experience I've had in years. Tech with taste. Feels like every other platform should study how they built it."
           </blockquote>
-          
+
           <div className="flex items-center gap-4">
             <img
               src="https://supabase.com/images/twitter-profiles/Y1swF6ef_400x400.jpg"
