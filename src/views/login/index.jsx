@@ -1,12 +1,12 @@
 import { ErrorMessage, Field, Form, Formik } from "formik";
 import { Link } from "react-router";
 import { signin } from "../../services/auth";
-import { useContext } from "react";
-import { AuthContext } from "../../context";
+import { authContext } from "../../context";
+
 
 export default function Login() {
-  const authContext = useContext(AuthContext)
-  console.log(authContext)
+  const {user, setUser} = authContext()
+  console.log(user)
   
   return (
     <div className="min-h-screen w-full bg-alternative flex flex-col lg:grid lg:grid-cols-12 overflow-x-hidden">
@@ -25,17 +25,19 @@ export default function Login() {
 
           {/* Formik Integration */}
           <Formik
-            initialValues={{ email: '', password: '' , username: '' }}
+            initialValues={{  password: '' , username: '' }}
             validate={values => {
               const errors = {};
-              if (!values.email) errors.email = 'Email is Required';
+              if (!values.username) errors.username = 'Username is Required';
 
               if (!values.password) errors.password = 'Password is Required';
               return errors;
             }}
-            onSubmit={(values, { setSubmitting }) => {
+            onSubmit={async(values, { setSubmitting }) => {
               
-             const response =  signin(values.username, values.password)
+             const {data} = await signin(values.username, values.password)
+             setUser(data)
+             setSubmitting(false)
             }}
           >
             {({ isSubmitting, errors, touched }) => (
@@ -59,7 +61,7 @@ export default function Login() {
                 </div>
 
                 {/* Email Field */}
-                <div className="flex flex-col gap-2">
+                {/* <div className="flex flex-col gap-2">
                   <label htmlFor="email" className="text-sm font-medium text-foreground">
                     Email Address
                   </label>
@@ -73,7 +75,7 @@ export default function Login() {
                       focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 h-10`}
                   />
                   <ErrorMessage name="email" component="span" className="text-xs text-destructive mt-1" />
-                </div>
+                </div> */}
 
                 {/* Password Field */}
                 <div className="flex flex-col gap-2 relative">
